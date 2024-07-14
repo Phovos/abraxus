@@ -1,3 +1,5 @@
+"""Relate complex numbers and virtual qubits"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -65,7 +67,58 @@ def visualize_bloch_sphere(qubits):
     plt.title("Qubit States on Bloch Sphere")
     plt.show()
 
+
+def map_physical_to_logical(physical_state):
+    # Example mapping function for different physical states to logical bits
+    if 0 <= physical_state <= 0.8:
+        return 0
+    elif 2 <= physical_state <= 5:
+        return 1
+    else:
+        raise ValueError("Invalid physical state")
+
+def normalize_probabilities(alpha_prob, beta_prob):
+    # Normalize probabilities to ensure their sum is 1
+    total_prob = alpha_prob + beta_prob
+    if total_prob != 1.0:
+        alpha_prob /= total_prob
+        beta_prob /= total_prob
+    return alpha_prob, beta_prob
+
+def interpret_byte(byte):
+    # Split the byte into two 4-bit segments for alpha and beta probabilities
+    alpha_bits = (byte & 0xF0) >> 4
+    beta_bits = byte & 0x0F
+    
+    # Normalize to probability
+    alpha_prob = alpha_bits / 15.0
+    beta_prob = beta_bits / 15.0
+    
+    # Ensure normalization
+    alpha_prob, beta_prob = normalize_probabilities(alpha_prob, beta_prob)
+    
+    return alpha_prob, beta_prob
+
+def process_qubit_instruction(byte):
+    alpha_prob, beta_prob = interpret_byte(byte)
+    # Here you can define operations like applying gates or measuring the qubit
+    # For example, let's say we want to measure the qubit:
+    measured_state = '0' if alpha_prob >= beta_prob else '1'
+    return measured_state
+
+
 # Example usage
+physical_state = 3.3  # Example voltage level
+logical_value = map_physical_to_logical(physical_state)
+byte = 0b10101100  # Example byte representing a qubit state
+alpha_prob, beta_prob = interpret_byte(byte)
+measured_state = process_qubit_instruction(byte)
+
+print(f"Logical Value: {logical_value}")
+print(f"Alpha Probability: {alpha_prob}")
+print(f"Beta Probability: {beta_prob}")
+print(f"Measured State: {measured_state}")
+
 qubits = [
     ComplexQubit((0,0), (0,0)),  # |0⟩
     ComplexQubit((255,255), (0,0)),  # |1⟩
