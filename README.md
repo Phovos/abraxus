@@ -376,7 +376,7 @@ An example [[event]] received from [[AtomicBot]]:
   "sub_type": "",
   "self": {
     "platform": "telegram",
-    "user_id": "123"  
+    "user_id": "123"
   },
   "message": [
     {

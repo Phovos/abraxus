@@ -1,7 +1,8 @@
 import asyncio
-import json
 import http.client
+import json
 from urllib.parse import urlparse
+
 
 class LlamaInterface:
     def __init__(self):
@@ -10,7 +11,7 @@ class LlamaInterface:
 
     async def __aenter__(self):
         try:
-            self.session = http.client.HTTPConnection('localhost', 11434)
+            self.session = http.client.HTTPConnection("localhost", 11434)
             self.session.connect()
         except ConnectionRefusedError:
             print("Warning: Unable to connect to Llama server. Switching to mock mode.")
@@ -26,24 +27,20 @@ class LlamaInterface:
             return f"Mock response for: {prompt}"
 
         if not self.session:
-            raise RuntimeError("LlamaInterface must be used as an async context manager")
+            raise RuntimeError(
+                "LlamaInterface must be used as an async context manager"
+            )
 
-        payload = json.dumps({
-            "model": "llama3",
-            "prompt": prompt,
-            "stream": False
-        })
-        headers = {
-            'Content-Type': 'application/json'
-        }
+        payload = json.dumps({"model": "llama3", "prompt": prompt, "stream": False})
+        headers = {"Content-Type": "application/json"}
 
         try:
-            self.session.request('POST', '/api/generate', body=payload, headers=headers)
+            self.session.request("POST", "/api/generate", body=payload, headers=headers)
             response = self.session.getresponse()
 
             if response.status == 200:
                 result = json.loads(response.read().decode())
-                return result['response']
+                return result["response"]
             else:
                 raise Exception(f"API request failed with status {response.status}")
         except Exception as e:
@@ -53,7 +50,7 @@ class LlamaInterface:
     async def extract_concepts(self, text):
         prompt = f"Extract key concepts from the following text:\n\n{text}\n\nConcepts:"
         response = await self._query_llama(prompt)
-        return [concept.strip() for concept in response.split(',')]
+        return [concept.strip() for concept in response.split(",")]
 
     async def process(self, task):
         return await self._query_llama(task)
