@@ -14,7 +14,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
 
-from src.bicycle_exp import AdaptiveMorphologicalSystem
 from src.kernel import SymbolicKernel
 from src.llama_interface import LlamaInterface
 
